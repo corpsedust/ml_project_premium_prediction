@@ -4,6 +4,11 @@ import joblib
 from joblib import load
 import streamlit as st
 import numpy as np
+from pathlib import Path 
+
+
+base_dir = Path(__file__).resolve().parent
+artifacts_dir = base_dir / "artifacts"
 
 
 
@@ -60,7 +65,7 @@ def preprocess_input(input_dict):
     for  i in disease:
         risk_score = risk_score+risk_scores[i]
         
-    risk_score_scaler = load("artifacts/risk_score_scaler.joblib")
+    risk_score_scaler = load(artifacts_dir / "risk_score_scaler.joblib")
     df['normalized_risk_score'] = risk_score_scaler.transform(np.array(risk_score).reshape(-1,1)).round(2)
     
     if input_dict['gender'] == 'Male':
@@ -85,8 +90,8 @@ def preprocess_input(input_dict):
         df['employment_status_Self-Employed'] = 1
     
     
-    young_scaler_file = load("artifacts/scaler_young.joblib")
-    old_scaler_file = load("artifacts/scaler_old.joblib")
+    young_scaler_file = load(artifacts_dir/"scaler_young.joblib")
+    old_scaler_file = load(artifacts_dir/"scaler_old.joblib")
     
     
     if input_dict['age'] <= 25:
@@ -115,8 +120,8 @@ def preprocess_input(input_dict):
 
 def predict(input):
     df = preprocess_input(input_dict = input)
-    model_old = load("artifacts\model_old.joblib")
-    model_young = load("artifacts\model_young.joblib")
+    model_old = load(artifacts_dir/"model_old.joblib")
+    model_young = load(artifacts_dir/"model_young.joblib")
     prediction = 0
     if input['age'] <= 25:
         prediction = model_young.predict(df)
